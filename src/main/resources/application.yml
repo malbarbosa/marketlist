@@ -1,0 +1,20 @@
+spring:
+  data:
+    dynamodb:
+      entity2ddl:
+        auto: create
+        gsiProjectionType: ALL
+        readCapacity: 10
+        writeCapacity: 1
+        
+#AMAZON CONFIG
+server:
+  port: 8780
+
+amazon:
+  access:
+    key: vx8dd
+    secret-key: 9hz4v
+  region: sa-east-1
+  end-point:
+    url: http://localhost:8000/
