@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.market</groupId>
-	<artifactId>marketList</artifactId>
+	<artifactId>marketList-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>com.marketlist</name>
+	<name>marketlist-api</name>
 	<description>My Market List</description>
 
 	<properties>
