@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/api/v1")
 public class HomeController extends AbstractController{
 	
 	
-	@GetMapping
+	@GetMapping("/home")
 	public String home(){
 		return "OK";
 	}

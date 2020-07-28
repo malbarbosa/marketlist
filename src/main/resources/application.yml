@@ -6,7 +6,8 @@ spring:
         gsiProjectionType: ALL
         readCapacity: 10
         writeCapacity: 1
-        
+
+jwt.secret: javainuse        
 #AMAZON CONFIG
 server:
   port: 8780

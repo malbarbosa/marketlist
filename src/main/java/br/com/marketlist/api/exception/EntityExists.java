@@ -3,8 +3,8 @@ package br.com.marketlist.api.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(code = HttpStatus.FOUND, reason = "User already exists")
-public class UserExists extends RuntimeException{
+@ResponseStatus(code = HttpStatus.FOUND, reason = "UserApp already exists")
+public class EntityExists extends RuntimeException{
 
 	/**
 	 * 

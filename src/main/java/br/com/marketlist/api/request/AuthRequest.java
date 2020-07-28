@@ -9,19 +9,16 @@ import javax.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class UserRequest implements Serializable{
+public class AuthRequest implements Serializable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -9014606199977832674L;
-	private String id;
-	@NotBlank
-	private String name;
 	@NotBlank
 	@Email
 	private String email;
 	@NotBlank
-	@Size(max = 20)
+	@Size(max = 20, message = "{user.max_length}")
 	private String password;
 
 }
