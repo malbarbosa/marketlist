@@ -36,9 +36,10 @@ public class AuthController extends AbstractController {
 	
 	@PostMapping
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequest authenticationRequest) throws Exception {
+		
 		authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 		Optional<UserApp> userApp = authService.authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-		userApp.orElseThrow(()-> new EntityNotFound());
+		userApp.orElseThrow(()-> new EntityNotFound("User not found"));
 		final String token = jwtTokenUtil.generateToken(userApp.get());
 		return ResponseEntity.ok(new JwtResponse(token));
 	}

@@ -1,5 +1,7 @@
 package br.com.marketlist.api.configuration;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,6 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable().authorizeRequests()
@@ -36,14 +39,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers(HttpMethod.POST, "/api/v1/authenticate").permitAll()
 			.anyRequest().authenticated()
 			.and()
-			
 			// filtra requisições de login
 			.addFilterBefore(new JWTLoginFilter("/authenticate", authenticationManager()),
 	                UsernamePasswordAuthenticationFilter.class)
-			
 			// filtra outras requisições para verificar a presença do JWT no header
 			.addFilterBefore(new JWTAuthenticationFilter(),
-	                UsernamePasswordAuthenticationFilter.class);
+	                UsernamePasswordAuthenticationFilter.class)
+			.exceptionHandling()
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            })
+            .authenticationEntryPoint((request, response, authException) -> {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            });
+			
+			
 	}
 	
 	@Override

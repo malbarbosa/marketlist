@@ -24,7 +24,9 @@ import br.com.marketlist.api.request.UserRequest;
 import br.com.marketlist.api.response.UserResponse;
 import br.com.marketlist.api.service.UserService;
 import br.com.marketlist.api.utils.MapperUtil;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController extends AbstractController{
@@ -42,22 +44,34 @@ public class UserController extends AbstractController{
 	
 	@GetMapping("/{id}")
 	public UserApp findById(@RequestParam("id") String id) {
-		Optional<UserApp> category = repository.findById(id);
-		if(!category.isPresent()) {
-			throw new EntityNotFound();
+		log.info("BEGIN - Class=UserController, Method=findById, parameters= {id:"+id+"}");
+		log.info("BEGIN - repository.findById ");
+		Optional<UserApp> user = repository.findById(id);
+		log.info("END - repository.findById ");
+		log.info("user.isPresent()="+user.isPresent());
+		if(!user.isPresent()) {
+			log.info("EntityNotFound - id:"+id);
+			throw new EntityNotFound("User not found");
 		}
-		return category.get();
+		UserApp userApp = user.get();
+		log.info("user:{"+userApp.toString()+"}");
+		return userApp;
 		
 	}
 	
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED, reason = "UserApp create!")
 	public UserResponse create(@Validated @RequestBody UserRequest userRequest) {
+		log.info("BEGIN - Class=UserController, Method=create, parameters= userRequest:{"+userRequest.toString()+"}");
 		UserApp userCreated = null;
+		log.info("BEGIN - service.findByEmail ");
 		Optional<UserApp> userApp = service.findByEmail(userRequest.getEmail());
+		log.info("END - service.findByEmail ");
+		log.info("END - service.findByEmail ");
 		if(userApp.isPresent()) {
 			throw new EntityExists();
 		}else{
+			log.info("Create User ");
 			userCreated = service.create(MapperUtil.map(userRequest, UserApp.class));
 		}
 		return MapperUtil.map(userCreated, UserResponse.class);
@@ -66,14 +80,20 @@ public class UserController extends AbstractController{
 	@PutMapping("/{id}")
 	@ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "UserApp updated!")
 	public UserResponse update(@PathVariable(name = "id") String id, @Validated  @RequestBody UserRequest userRequest) {
+		log.info("BEGIN - Class=UserController, Method=update, parameters= {id:"+id+",userRequest:{"+userRequest.toString()+"}}");
+		log.info("BEGIN - repository.findById ");
 		Optional<UserApp> userApp = repository.findById(id);
 		if(!userApp.isPresent()) {
-			throw new EntityNotFound();
+			log.info("EntityNotFound");
+			throw new EntityNotFound("User not found");
 		}
 		UserApp userFound = userApp.get();
 		userRequest.setEmail(userFound.getEmail());
+		userRequest.setId(id);
 		MapperUtil.mapTo(userRequest, userFound);
+		log.info("BEGIN - Updating user ");
 		UserApp userUpdated = service.update(userFound);
 		return MapperUtil.map(userUpdated, UserResponse.class);
 	}
+	
 }

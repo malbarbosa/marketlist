@@ -6,6 +6,12 @@ spring:
         gsiProjectionType: ALL
         readCapacity: 10
         writeCapacity: 1
+        streamEnabled: true
+        streamViewType: NEW_AND_OLD_IMAGES
+        
+logging:
+  level:
+    web: debug
 
 jwt.secret: javainuse        
 #AMAZON CONFIG

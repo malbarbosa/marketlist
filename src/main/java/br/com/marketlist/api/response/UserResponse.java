@@ -12,6 +12,6 @@ public class UserResponse implements Serializable{
 	private static final long serialVersionUID = -9014606199977832674L;
 	
 	private String id;
-	private String nome;
+	private String name;
 	private String email;
 }

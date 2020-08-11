@@ -13,7 +13,7 @@ import br.com.marketlist.api.converters.OffsetDateTimeConverter;
 import lombok.Data;
 
 @Data
-@DynamoDBTable(tableName = "UserApp")
+@DynamoDBTable(tableName = "userApp")
 public class UserApp{
 	
 	@DynamoDBHashKey
@@ -32,6 +32,7 @@ public class UserApp{
 	@DynamoDBAttribute
 	@DynamoDBTypeConverted(converter = OffsetDateTimeConverter.class)
 	private OffsetDateTime dateUpdated;
+	
 	
 	
 }

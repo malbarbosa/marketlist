@@ -1,12 +1,9 @@
 package br.com.marketlist.api.exception;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.joda.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,30 +18,26 @@ import br.com.marketlist.api.response.ResponseError;
 @ControllerAdvice
 public class ApiExceptionHandler {
 
-	@Autowired
-	private MessageSource messageSource;
 
 	@ExceptionHandler(EntityNotFound.class)
 	public ResponseEntity<?> treatEntityNotFoundException(
 			EntityNotFound e) {
-		ResponseError problema = ResponseError.builder()
-				.dateHour(LocalDateTime.now())
-				.message(messageSource.getMessage(e.getMessage(), null,
-						Locale.getDefault())).build();
+		ResponseError error = ResponseError.builder()
+				.dateHourError(LocalDateTime.now().toString())
+				.message(e.getMessage()).build();
 		
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body(problema);
+				.body(error);
 	}
 	
 	@ExceptionHandler(BusinessException.class)
 	public ResponseEntity<?> treatBusicessException(BusinessException e) {
-		ResponseError problema = ResponseError.builder()
-				.dateHour(LocalDateTime.now())
-				.message(messageSource.getMessage(e.getMessage(), null,
-						Locale.getDefault())).build();
+		ResponseError error = ResponseError.builder()
+				.dateHourError(LocalDateTime.now().toString())
+				.message(e.getMessage()).build();
 		
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(problema);
+				.body(error);
 	}
 	
 	/**
@@ -81,4 +74,5 @@ public class ApiExceptionHandler {
 	            .fieldName(""+HttpStatus.UNPROCESSABLE_ENTITY.value())
 	            .build();
 	}
+	
 }

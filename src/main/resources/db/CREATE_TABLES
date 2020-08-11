@@ -1,0 +1,15 @@
+#CREATE USER TABLE
+aws dynamodb create-table --table-name userApp \
+--attribute-definitions AttributeName=id,AttributeType=S \
+--key-schema AttributeName=id,KeyType=HASH \
+--provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=1 \
+--stream-specification StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES \
+--region sa-east-1 --output json --profile default --endpoint-url http://localhost:8000
+
+#CREATE CATEGORY TABLE
+aws dynamodb create-table --table-name category \
+--attribute-definitions AttributeName=id,AttributeType=N \
+--key-schema AttributeName=id,KeyType=HASH \
+--provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=1 \
+--stream-specification StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES \
+--region sa-east-1 --output json --profile default --endpoint-url http://localhost:8000

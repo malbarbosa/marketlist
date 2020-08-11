@@ -21,7 +21,7 @@ public class UserRequest implements Serializable{
 	@Email
 	private String email;
 	@NotBlank
-	@Size(max = 20)
+	@Size(max = 255)
 	private String password;
 
 }

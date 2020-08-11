@@ -1,7 +1,6 @@
 package br.com.markelist.api.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Optional;
 
@@ -17,7 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import br.com.marketlist.api.Application;
-import br.com.marketlist.api.exception.EntityNotFound;
 import br.com.marketlist.api.model.UserApp;
 import br.com.marketlist.api.repository.UserRepository;
 import br.com.marketlist.api.service.UserService;
@@ -52,10 +50,8 @@ class UserServiceTest {
 	@Test
 	public void mustReturnAnException_EntityNotFound() {
 		Mockito.when(repository.findByEmail(Mockito.anyString())).thenReturn(Optional.ofNullable(null));
-		assertThrows(
-				EntityNotFound.class,
-				() -> service.findByEmail("teste@teste.com.br"));
-		
+		Optional<UserApp> user = service.findByEmail("teste@teste.com.br");
+		assertEquals(true, user.isEmpty());
 	}
 	
 	@Test

@@ -1,7 +1,5 @@
 package br.com.marketlist.api.response;
 
-import org.joda.time.LocalDateTime;
-
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,7 +8,7 @@ import lombok.Getter;
 public class ResponseError {
 	
 	private String message;
-	private LocalDateTime dateHour;
+	private String dateHourError;
 
 
 }

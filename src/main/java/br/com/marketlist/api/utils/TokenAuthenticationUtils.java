@@ -39,11 +39,12 @@ public class TokenAuthenticationUtils {
 		
 		if (token != null) {
 			// faz parse do token
-			String user = Jwts.parser()
+				String user = Jwts.parser()
 					.setSigningKey(SECRET)
 					.parseClaimsJws(token.replace(TOKEN_PREFIX, "").trim())
 					.getBody()
 					.getSubject();
+			
 			
 			if (user != null) {
 				return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
