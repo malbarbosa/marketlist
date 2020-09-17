@@ -48,7 +48,6 @@ class UserControllerTest {
 	@Test
 	void mustReturnFindAll() {
 		List<UserApp> list = new ArrayList<UserApp>();
-		
 		list.add(userFake);
 		Mockito.when(repository.findAll()).thenReturn(list);
 		List<UserApp> findAll = controller.findAll();

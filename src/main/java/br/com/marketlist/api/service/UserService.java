@@ -6,14 +6,14 @@ import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import br.com.marketlist.api.model.UserApp;
 import br.com.marketlist.api.repository.UserRepository;
@@ -29,10 +29,6 @@ public class UserService implements UserDetailsService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-	@Transactional(timeout = 2000, 
-			noRollbackFor = Exception.class, 
-			readOnly = true,
-			propagation = Propagation.REQUIRED)
 	public UserApp create(final UserApp user){
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		log.info("BEGIN - Class=UserService, Method=create, parameters= user: {"+user.toString()+"}");
@@ -42,10 +38,6 @@ public class UserService implements UserDetailsService {
 		return createdUser;
 	}
 	
-	@Transactional(timeout = 2000, 
-			noRollbackFor = Exception.class, 
-			readOnly = true,
-			propagation = Propagation.NOT_SUPPORTED)
 	public Optional<UserApp> findByEmail(final String email) {
 		log.debug("BEGIN - Class=UserService, Method=findByEmail, parameters= {email="+email+"}");
 		Optional<UserApp> userApp = repository.findByEmail(email);
@@ -53,10 +45,6 @@ public class UserService implements UserDetailsService {
 		return userApp;
 	}
 	
-	@Transactional(timeout = 2000, 
-			noRollbackFor = Exception.class, 
-			readOnly = true,
-			propagation = Propagation.REQUIRED)
 	public UserApp update(UserApp user) {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		log.debug("BEGIN - Class=UserService, Method=update, parameters= user: {"+user.toString()+"}");
@@ -68,10 +56,6 @@ public class UserService implements UserDetailsService {
 		return updatedUser; 
 	}
 	
-	@Transactional(timeout = 2000, 
-			noRollbackFor = Exception.class, 
-			readOnly = true,
-			propagation = Propagation.REQUIRED)
 	public void delete(UserApp user) {
 		log.debug("BEGIN - Class=UserService, Method=delete, parameters= user: {"+user.toString()+"}");
 		if(user != null && user.getId() != null) {
@@ -94,5 +78,12 @@ public class UserService implements UserDetailsService {
 		log.debug("Success - User founded.");
     	return new User(userFound.get().getEmail(), userFound.get().getPassword(), emptyList());
     }
+	
+	public Optional<UserApp> getUserFromToken() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Optional<UserApp> user = this.findByEmail(email);
+		return user;
+	}
 	
 }

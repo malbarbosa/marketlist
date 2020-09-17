@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class CategoryRequest implements Serializable{
+public class ItemRequest implements Serializable{
 	/**
 	 * 
 	 */

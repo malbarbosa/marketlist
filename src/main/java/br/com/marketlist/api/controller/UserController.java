@@ -51,7 +51,7 @@ public class UserController extends AbstractController{
 		log.info("user.isPresent()="+user.isPresent());
 		if(!user.isPresent()) {
 			log.info("EntityNotFound - id:"+id);
-			throw new EntityNotFound("User not found");
+			throw new EntityNotFound("User not found!");
 		}
 		UserApp userApp = user.get();
 		log.info("user:{"+userApp.toString()+"}");
@@ -64,12 +64,10 @@ public class UserController extends AbstractController{
 	public UserResponse create(@Validated @RequestBody UserRequest userRequest) {
 		log.info("BEGIN - Class=UserController, Method=create, parameters= userRequest:{"+userRequest.toString()+"}");
 		UserApp userCreated = null;
-		log.info("BEGIN - service.findByEmail ");
 		Optional<UserApp> userApp = service.findByEmail(userRequest.getEmail());
-		log.info("END - service.findByEmail ");
-		log.info("END - service.findByEmail ");
 		if(userApp.isPresent()) {
-			throw new EntityExists();
+			log.info("BEGIN - Class=UserController, Method=create, EntityExists");
+			throw new EntityExists("User is already exists!");
 		}else{
 			log.info("Create User ");
 			userCreated = service.create(MapperUtil.map(userRequest, UserApp.class));
@@ -81,18 +79,18 @@ public class UserController extends AbstractController{
 	@ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "UserApp updated!")
 	public UserResponse update(@PathVariable(name = "id") String id, @Validated  @RequestBody UserRequest userRequest) {
 		log.info("BEGIN - Class=UserController, Method=update, parameters= {id:"+id+",userRequest:{"+userRequest.toString()+"}}");
-		log.info("BEGIN - repository.findById ");
 		Optional<UserApp> userApp = repository.findById(id);
 		if(!userApp.isPresent()) {
-			log.info("EntityNotFound");
-			throw new EntityNotFound("User not found");
+			log.info("User not found");
+			throw new EntityNotFound("User not found!");
 		}
 		UserApp userFound = userApp.get();
+		log.info("userFound: {"+userFound.toString()+"}");
 		userRequest.setEmail(userFound.getEmail());
 		userRequest.setId(id);
 		MapperUtil.mapTo(userRequest, userFound);
-		log.info("BEGIN - Updating user ");
 		UserApp userUpdated = service.update(userFound);
+		log.info("END - Update user ");
 		return MapperUtil.map(userUpdated, UserResponse.class);
 	}
 	

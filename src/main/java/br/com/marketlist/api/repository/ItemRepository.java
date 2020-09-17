@@ -6,13 +6,12 @@ import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
-import br.com.marketlist.api.model.Category;
+import br.com.marketlist.api.model.Item;
 
 @EnableScan
 @Component
-public interface CategoryRepository extends CrudRepository<Category, String>{
+public interface ItemRepository extends CrudRepository<Item, String>{
 
-
-	Optional<Category> findFirstByNameOrderByVersionDesc(String name);
+	Optional<Item> findFirstByNameOrderByVersionDesc(String name);
 	
 }

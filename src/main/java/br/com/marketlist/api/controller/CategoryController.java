@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.marketlist.api.exception.EntityExists;
 import br.com.marketlist.api.exception.EntityNotFound;
 import br.com.marketlist.api.model.Category;
 import br.com.marketlist.api.repository.CategoryRepository;
@@ -24,7 +24,9 @@ import br.com.marketlist.api.request.CategoryRequest;
 import br.com.marketlist.api.response.CategoryResponse;
 import br.com.marketlist.api.service.CategoryService;
 import br.com.marketlist.api.utils.MapperUtil;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/categories")
 public class CategoryController extends AbstractController{
@@ -42,37 +44,58 @@ public class CategoryController extends AbstractController{
 	
 	@GetMapping("/{id}")
 	public Category findById(@RequestParam("id") String id) {
-		Optional<Category> category = repository.findById(id);
-		if(!category.isPresent()) {
-			throw new EntityNotFound("Category not found");
+		log.info("BEGIN - Class=CategoryController, Method=findById, parameters= {id:"+id+"}");
+		Optional<Category> categoryFound = repository.findById(id);
+		if(!categoryFound.isPresent()) {
+			log.info("Category not found");
+			throw new EntityNotFound("Category not found!");
 		}
-		return category.get();
+		Category category = categoryFound.get();
+		log.info("END - category: {"+ category.toString()+"}");
+		return category;
 		
 	}
 	
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED, reason = "Category create!")
 	public CategoryResponse create(@Validated @RequestBody CategoryRequest categoryRequest) {
-		Category userCreated = null;
-		Optional<Category> userApp = repository.findById(categoryRequest.getId());
-		if(userApp.isPresent()) {
-			throw new EntityExists();
-		}else{
-			userCreated = service.create(MapperUtil.map(categoryRequest, Category.class));
-		}
-		return MapperUtil.map(userCreated, CategoryResponse.class);
+		log.info("BEGIN - Class=CategoryController, Method=create, parameters= {categoryRequest:"+categoryRequest.toString()+"}");
+		Category categoryCreated = service.create(MapperUtil.map(categoryRequest, Category.class));
+		log.info("END - categoryCreated: {"+categoryCreated.toString()+"}");
+		return MapperUtil.map(categoryCreated, CategoryResponse.class);
 	}
 	
 	@PutMapping("/{id}")
 	@ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "Category  updated!")
-	public CategoryResponse update(@PathVariable(name = "id") String id, @Validated  @RequestBody CategoryRequest categoryRequest) {
+	public void update(@PathVariable(name = "id") String id, @Validated  @RequestBody CategoryRequest categoryRequest) {
+		log.info("BEGIN - Class=CategoryController, Method=update, parameters= {id:"+id+",categoryRequest:"+categoryRequest.toString()+"}");
 		Optional<Category> category = repository.findById(id);
 		if(!category.isPresent()) {
-			throw new EntityNotFound("Category not found");
+			log.info("Category not found");
+			throw new EntityNotFound("Category not found!");
 		}
-		Category categoryFound = category.get();
+		
+        Category categoryFound = category.get();
+		log.info("categoryFound: {"+ categoryFound.toString()+"}");
 		MapperUtil.mapTo(categoryRequest, categoryFound);
 		Category categoryUpdated = service.update(categoryFound);
-		return MapperUtil.map(categoryUpdated, CategoryResponse.class);
+		log.info("END - categoryUpdated: {"+categoryUpdated.toString()+"}");
+	}
+	
+	@DeleteMapping("/{id}")
+	@ResponseStatus(code = HttpStatus.OK, reason = "Category  deleted!")
+	public void delete(@PathVariable(name = "id") String id, @Validated  @RequestBody CategoryRequest categoryRequest) {
+		log.info("BEGIN - Class=CategoryController, Method=delete, parameters= {id:"+id+",categoryRequest:"+categoryRequest.toString()+"}");
+		Optional<Category> category = repository.findById(id);
+		if(!category.isPresent()) {
+			log.info("Category not found");
+			throw new EntityNotFound("Category not found!");
+		}
+		Category categoryFound = category.get();
+		log.info("categoryFound: {"+ categoryFound.toString()+"}");
+		categoryRequest.setId(id);
+		MapperUtil.mapTo(categoryRequest, categoryFound);
+		service.delete(categoryFound);
+		log.info("END - categoryDeleted: {"+categoryFound.toString()+"}");
 	}
 }
