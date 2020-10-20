@@ -18,18 +18,21 @@ import br.com.marketlist.api.Application;
 import br.com.marketlist.api.model.Category;
 import br.com.marketlist.api.model.UserApp;
 import br.com.marketlist.api.repository.CategoryRepository;
+import br.com.marketlist.api.service.impl.CategoryServiceImpl;
+import br.com.marketlist.api.service.impl.UserServiceImpl;
 
 @SpringBootTest(classes = Application.class)
 @ExtendWith(MockitoExtension.class)
-class CategoryServiceTest {
+class CategoryServiceImplTest {
 	
 	@InjectMocks
-	private CategoryService service;
+	private CategoryServiceImpl service;
 	@Mock
 	private CategoryRepository repository;
 	@Mock
-	private UserService userService;
+	private UserServiceImpl userServiceImpl;
 	private Category categoryFake;
+	private UserApp userFake;
 	
 	@BeforeEach
 	public void setup() {
@@ -38,7 +41,7 @@ class CategoryServiceTest {
 		categoryFake.setId(String.valueOf(categoryFake.hashCode()));
 		categoryFake.setCreatedAt(OffsetDateTime.now());
 		categoryFake.nextVersion();
-		UserApp userFake = new UserApp();
+		userFake = new UserApp();
 		userFake.setName("Teste");
 		userFake.setPassword("123");
 		userFake.setEmail("teste@teste.com.br");
@@ -48,6 +51,7 @@ class CategoryServiceTest {
 	public void mustCreateCategory() {
 		var category = new Category();
 		category.setName("Canned");
+		Mockito.when(userServiceImpl.getUserFromToken()).thenReturn(Optional.of(userFake));
 		Mockito.when(repository.save(Mockito.any(Category.class))).thenReturn(categoryFake);
 		category = service.create(category);
 		assertEquals(true, (category.getCreatedAt() != null));
@@ -55,6 +59,7 @@ class CategoryServiceTest {
 	
 	@Test
 	public void mustUpdateCategory() {
+		Mockito.when(userServiceImpl.getUserFromToken()).thenReturn(Optional.of(userFake));
 		Mockito.when(repository.save(Mockito.any(Category.class))).thenReturn(categoryFake);
 		Category category = service.update(categoryFake);
 		assertEquals(true, (category.getCreatedAt() != null));

@@ -3,6 +3,7 @@ package br.com.marketlist.api.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -18,12 +19,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.marketlist.api.exception.EntityNotFound;
+import br.com.marketlist.api.model.Category;
 import br.com.marketlist.api.model.Item;
+import br.com.marketlist.api.repository.CategoryRepository;
 import br.com.marketlist.api.repository.ItemRepository;
 import br.com.marketlist.api.request.ItemRequest;
 import br.com.marketlist.api.response.ItemResponse;
-import br.com.marketlist.api.service.ItemService;
-import br.com.marketlist.api.utils.MapperUtil;
+import br.com.marketlist.api.service.impl.ItemServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,10 +34,16 @@ import lombok.extern.slf4j.Slf4j;
 public class ItemController extends AbstractController{
 	
 	@Autowired
-	private ItemService service;
+	private ItemServiceImpl service;
 	
 	@Autowired
 	private ItemRepository repository;
+	
+	@Autowired
+	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private ModelMapper mapper;
 	
 	@GetMapping
 	public List<Item> findAll(){
@@ -58,44 +66,44 @@ public class ItemController extends AbstractController{
 	
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED, reason = "Item create!")
-	public ItemResponse create(@Validated @RequestBody ItemRequest ItemRequest) {
-		log.info("BEGIN - Class=ItemController, Method=create, parameters= {ItemRequest:"+ItemRequest.toString()+"}");
-		Item ItemCreated = service.create(MapperUtil.map(ItemRequest, Item.class));
+	public ItemResponse create(@Validated @RequestBody ItemRequest itemRequest) {
+		log.info("BEGIN - Class=ItemController, Method=create, parameters= {ItemRequest:"+itemRequest.toString()+"}");
+		Optional<Category> category = categoryRepository.findById(itemRequest.getCategory().getId());
+		category.orElseThrow(()->new EntityNotFound(String.format("Category with id %s was not found!", itemRequest.getCategory().getId())));
+		Item itemMap = mapper.map(itemRequest, Item.class);
+		itemMap.setCategory(category.get());
+		Item ItemCreated = service.create(itemMap);
 		log.info("END - ItemCreated: {"+ItemCreated.toString()+"}");
-		return MapperUtil.map(ItemCreated, ItemResponse.class);
+		return mapper.map(ItemCreated, ItemResponse.class);
 	}
 	
 	@PutMapping("/{id}")
 	@ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "Item  updated!")
 	public void update(@PathVariable(name = "id") String id, @Validated  @RequestBody ItemRequest ItemRequest) {
 		log.info("BEGIN - Class=ItemController, Method=update, parameters= {id:"+id+",ItemRequest:"+ItemRequest.toString()+"}");
-		Optional<Item> Item = repository.findById(id);
-		if(!Item.isPresent()) {
-			log.info("Item not found");
-			throw new EntityNotFound("Item not found!");
-		}
-		
-        Item ItemFound = Item.get();
+		Item ItemFound = checkItem(id);
 		log.info("ItemFound: {"+ ItemFound.toString()+"}");
-		MapperUtil.mapTo(ItemRequest, ItemFound);
+		mapper.map(ItemRequest, ItemFound);
 		Item ItemUpdated = service.update(ItemFound);
 		log.info("END - ItemUpdated: {"+ItemUpdated.toString()+"}");
 	}
 	
 	@DeleteMapping("/{id}")
 	@ResponseStatus(code = HttpStatus.OK, reason = "Item  deleted!")
-	public void delete(@PathVariable(name = "id") String id, @Validated  @RequestBody ItemRequest ItemRequest) {
-		log.info("BEGIN - Class=ItemController, Method=delete, parameters= {id:"+id+",ItemRequest:"+ItemRequest.toString()+"}");
-		Optional<Item> Item = repository.findById(id);
-		if(!Item.isPresent()) {
-			log.info("Item not found");
-			throw new EntityNotFound("Item not found!");
-		}
-		Item ItemFound = Item.get();
+	public void delete(@PathVariable(name = "id") String id, @Validated  @RequestBody ItemRequest itemRequest) {
+		log.info("BEGIN - Class=ItemController, Method=delete, parameters= {id:"+id+",ItemRequest:"+itemRequest.toString()+"}");
+		Item ItemFound = checkItem(id);
 		log.info("ItemFound: {"+ ItemFound.toString()+"}");
-		ItemRequest.setId(id);
-		MapperUtil.mapTo(ItemRequest, ItemFound);
+		itemRequest.setId(id);
+		mapper.map(itemRequest, ItemFound);
 		service.delete(ItemFound);
 		log.info("END - ItemDeleted: {"+ItemFound.toString()+"}");
+	}
+
+	private Item checkItem(String id) {
+		Optional<Item> item = repository.findById(id);
+		item.orElseThrow(()->new EntityNotFound(String.format("Item with id %s was not found!", id)));
+		Item ItemFound = item.get();
+		return ItemFound;
 	}
 }

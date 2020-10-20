@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import br.com.marketlist.api.filter.JWTAuthenticationFilter;
 import br.com.marketlist.api.filter.JWTLoginFilter;
-import br.com.marketlist.api.service.UserService;
+import br.com.marketlist.api.service.impl.UserServiceImpl;
 
 @Configuration
 @EnableWebSecurity
@@ -26,7 +26,7 @@ import br.com.marketlist.api.service.UserService;
 @ComponentScan(basePackages = "br.com.marketlist.api.*")
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
-	private UserService userDetailsService;
+	private UserServiceImpl userDetailsService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 

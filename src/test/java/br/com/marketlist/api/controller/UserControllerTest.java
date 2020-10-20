@@ -22,7 +22,7 @@ import br.com.marketlist.api.exception.EntityNotFound;
 import br.com.marketlist.api.model.UserApp;
 import br.com.marketlist.api.repository.UserRepository;
 import br.com.marketlist.api.request.UserRequest;
-import br.com.marketlist.api.service.UserService;
+import br.com.marketlist.api.service.impl.UserServiceImpl;
 
 @SpringBootTest(classes = Application.class)
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +31,7 @@ class UserControllerTest {
 	@Mock
 	private UserRepository repository;
 	@Mock
-	private UserService service;
+	private UserServiceImpl service;
 	@InjectMocks
 	private UserController controller;
 	private UserApp userFake;

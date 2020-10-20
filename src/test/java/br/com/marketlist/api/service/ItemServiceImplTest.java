@@ -14,17 +14,18 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import br.com.marketlist.api.Application;
+import br.com.marketlist.api.model.Category;
 import br.com.marketlist.api.model.Item;
 import br.com.marketlist.api.model.UserApp;
 import br.com.marketlist.api.repository.ItemRepository;
+import br.com.marketlist.api.service.impl.ItemServiceImpl;
 
-@SpringBootTest(classes = Application.class)
+@SpringBootTest(classes = ItemServiceImpl.class)
 @ExtendWith(MockitoExtension.class)
-class ItemServiceTest {
+class ItemServiceImplTest {
 
 	@InjectMocks
-	private ItemService service;
+	private ItemServiceImpl service;
 	@Mock
 	private ItemRepository repository;
 	@Mock
@@ -34,10 +35,16 @@ class ItemServiceTest {
 	@BeforeEach
 	public void setup() {
 		itemFake = new Item();
-		itemFake.setName("Canned");
+		itemFake.setName("Corn");
 		itemFake.setId(String.valueOf(itemFake.hashCode()));
 		itemFake.setCreatedAt(OffsetDateTime.now());
 		itemFake.nextVersion();
+		Category categoryFake = new Category();
+		categoryFake.setName("Canned");
+		categoryFake.setId(String.valueOf(categoryFake.hashCode()));
+		categoryFake.setCreatedAt(OffsetDateTime.now());
+		categoryFake.nextVersion();
+		itemFake.setCategory(categoryFake);
 		UserApp userFake = new UserApp();
 		userFake.setName("Teste");
 		userFake.setPassword("123");
@@ -47,7 +54,7 @@ class ItemServiceTest {
 	@Test
 	public void mustCreateItem() {
 		var item = new Item();
-		item.setName("Canned");
+		item.setName("Corn");
 		Mockito.when(repository.save(Mockito.any(Item.class))).thenReturn(itemFake);
 		item = service.create(item);
 		assertEquals(true, (item.getCreatedAt() != null));
@@ -61,7 +68,14 @@ class ItemServiceTest {
 	}
 	
 	@Test
-	public void mustFindCategoryLastVersion() {
+	public void mustDeleteItem() {
+		Mockito.when(repository.save(Mockito.any(Item.class))).thenReturn(itemFake);
+		Optional<Item> item = service.delete(itemFake);
+		assertEquals(true, item.isPresent()?item.get().isDeleted():false);
+	}
+	
+	@Test
+	public void mustFindItemLastVersion() {
 		itemFake.nextVersion();
 		Mockito.when(repository.findFirstByNameOrderByVersionDesc(Mockito.anyString())).thenReturn(Optional.of(itemFake));
 		Optional<Item> itemReturn = service.findLastVersionBy("Canned");

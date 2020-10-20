@@ -3,6 +3,7 @@ package br.com.marketlist.api.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -17,13 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.marketlist.api.exception.EntityExists;
 import br.com.marketlist.api.exception.EntityNotFound;
 import br.com.marketlist.api.model.Category;
 import br.com.marketlist.api.repository.CategoryRepository;
 import br.com.marketlist.api.request.CategoryRequest;
 import br.com.marketlist.api.response.CategoryResponse;
 import br.com.marketlist.api.service.CategoryService;
-import br.com.marketlist.api.utils.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,9 +38,12 @@ public class CategoryController extends AbstractController{
 	@Autowired
 	private CategoryRepository repository;
 	
+	@Autowired
+	private ModelMapper mapper;
+	
 	@GetMapping
 	public List<Category> findAll(){
-		return (List<Category>) repository.findAll();
+		return (List<Category>) service.findAllLastVersion();
 	}
 	
 	@GetMapping("/{id}")
@@ -60,9 +64,13 @@ public class CategoryController extends AbstractController{
 	@ResponseStatus(code = HttpStatus.CREATED, reason = "Category create!")
 	public CategoryResponse create(@Validated @RequestBody CategoryRequest categoryRequest) {
 		log.info("BEGIN - Class=CategoryController, Method=create, parameters= {categoryRequest:"+categoryRequest.toString()+"}");
-		Category categoryCreated = service.create(MapperUtil.map(categoryRequest, Category.class));
+		Optional<Category> categoryFound = service.findByName(categoryRequest.getName());
+		if(categoryFound.isPresent()) {
+			throw new EntityExists(String.format("Category %s already exists",categoryRequest.getName()));	
+		}
+		Category categoryCreated = service.create(mapper.map(categoryRequest, Category.class));
 		log.info("END - categoryCreated: {"+categoryCreated.toString()+"}");
-		return MapperUtil.map(categoryCreated, CategoryResponse.class);
+		return mapper.map(categoryCreated, CategoryResponse.class);
 	}
 	
 	@PutMapping("/{id}")
@@ -77,7 +85,7 @@ public class CategoryController extends AbstractController{
 		
         Category categoryFound = category.get();
 		log.info("categoryFound: {"+ categoryFound.toString()+"}");
-		MapperUtil.mapTo(categoryRequest, categoryFound);
+		mapper.map(categoryRequest, categoryFound);
 		Category categoryUpdated = service.update(categoryFound);
 		log.info("END - categoryUpdated: {"+categoryUpdated.toString()+"}");
 	}
@@ -94,7 +102,7 @@ public class CategoryController extends AbstractController{
 		Category categoryFound = category.get();
 		log.info("categoryFound: {"+ categoryFound.toString()+"}");
 		categoryRequest.setId(id);
-		MapperUtil.mapTo(categoryRequest, categoryFound);
+		mapper.map(categoryRequest, categoryFound);
 		service.delete(categoryFound);
 		log.info("END - categoryDeleted: {"+categoryFound.toString()+"}");
 	}

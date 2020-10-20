@@ -1,9 +1,9 @@
 package br.com.marketlist.api.exception;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.joda.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,7 +23,7 @@ public class ApiExceptionHandler {
 	public ResponseEntity<?> treatEntityNotFoundException(
 			EntityNotFound e) {
 		ResponseError error = ResponseError.builder()
-				.dateHourError(LocalDateTime.now().toString())
+				.dateHourError(OffsetDateTime.now().toString())
 				.message(e.getMessage()).build();
 		
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -33,7 +33,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(BusinessException.class)
 	public ResponseEntity<?> treatBusicessException(BusinessException e) {
 		ResponseError error = ResponseError.builder()
-				.dateHourError(LocalDateTime.now().toString())
+				.dateHourError(OffsetDateTime.now().toString())
 				.message(e.getMessage()).build();
 		
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)

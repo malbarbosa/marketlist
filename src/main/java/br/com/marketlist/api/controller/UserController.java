@@ -3,6 +3,7 @@ package br.com.marketlist.api.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -22,8 +23,7 @@ import br.com.marketlist.api.model.UserApp;
 import br.com.marketlist.api.repository.UserRepository;
 import br.com.marketlist.api.request.UserRequest;
 import br.com.marketlist.api.response.UserResponse;
-import br.com.marketlist.api.service.UserService;
-import br.com.marketlist.api.utils.MapperUtil;
+import br.com.marketlist.api.service.impl.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,10 +32,13 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController extends AbstractController{
 	
 	@Autowired
-	private UserService service;
+	private UserServiceImpl service;
 	
 	@Autowired
 	private UserRepository repository;
+	
+	@Autowired
+	private ModelMapper mapper;
 	
 	@GetMapping
 	public List<UserApp> findAll(){
@@ -70,9 +73,9 @@ public class UserController extends AbstractController{
 			throw new EntityExists("User is already exists!");
 		}else{
 			log.info("Create User ");
-			userCreated = service.create(MapperUtil.map(userRequest, UserApp.class));
+			userCreated = service.create(mapper.map(userRequest, UserApp.class));
 		}
-		return MapperUtil.map(userCreated, UserResponse.class);
+		return mapper.map(userCreated, UserResponse.class);
 	}
 	
 	@PutMapping("/{id}")
@@ -88,10 +91,10 @@ public class UserController extends AbstractController{
 		log.info("userFound: {"+userFound.toString()+"}");
 		userRequest.setEmail(userFound.getEmail());
 		userRequest.setId(id);
-		MapperUtil.mapTo(userRequest, userFound);
+		mapper.map(userRequest, userFound);
 		UserApp userUpdated = service.update(userFound);
 		log.info("END - Update user ");
-		return MapperUtil.map(userUpdated, UserResponse.class);
+		return mapper.map(userUpdated, UserResponse.class);
 	}
 	
 }

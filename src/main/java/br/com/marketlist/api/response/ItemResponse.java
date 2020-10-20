@@ -13,4 +13,5 @@ public class ItemResponse implements Serializable{
 	
 	private String id;
 	private String name;
+	private CategoryResponse category;
 }

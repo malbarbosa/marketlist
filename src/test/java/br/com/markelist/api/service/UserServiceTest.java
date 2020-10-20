@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,14 +19,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import br.com.marketlist.api.Application;
 import br.com.marketlist.api.model.UserApp;
 import br.com.marketlist.api.repository.UserRepository;
-import br.com.marketlist.api.service.UserService;
+import br.com.marketlist.api.service.impl.UserServiceImpl;
 
 @SpringBootTest(classes = Application.class)
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 	
 	@InjectMocks
-	private UserService service;
+	private UserServiceImpl service;
 	@Mock
 	private UserRepository repository;
 	@MockBean
@@ -36,8 +37,14 @@ class UserServiceTest {
 	public void setup() throws Exception {
 			userFake = new UserApp();
 			userFake.setName("Teste");
-			userFake.setPassword("123");
+			userFake.setPassword(passwordEncoder.encode("123"));
 			userFake.setEmail("teste@teste.com.br");
+			repository.save(userFake);
+	}
+	
+	@AfterEach
+	public void terminate() {
+		repository.delete(userFake);
 	}
 	
 	@Test

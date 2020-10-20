@@ -46,19 +46,6 @@
 		    <scope>test</scope>
 		</dependency>
 		
-		<!-- DynamoDB -->
-		<dependency>
-		   <groupId>com.amazonaws</groupId>
-		   <artifactId>aws-java-sdk-dynamodb</artifactId>
-		   <version>1.11.573</version>
-		</dependency>
-		<dependency>
-		   <groupId>io.github.boostchicken</groupId>
-		   <artifactId>spring-data-dynamodb</artifactId>
-		   <version>5.2.1</version>
-		</dependency>
-		<!-- DynamoDB -->
-		
 		<!-- ModelMapper (Convert Entity To DTO) -->
 		<dependency>
 		    <groupId>org.modelmapper</groupId>
@@ -94,13 +81,42 @@
 		    <artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
 		
-		<!-- Runtime, com.sun.xml.bind module -->
 		<dependency>
-		    <groupId>org.glassfish.jaxb</groupId>
-		    <artifactId>jaxb-runtime</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 		
+		<!--  MongoDB -->
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>
+				spring-boot-starter-data-mongodb-reactive
+			</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+	
+	<repositories>
+		<repository>
+			<id>mulesoft</id>
+			<name>mulesoft</name>
+			<url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
