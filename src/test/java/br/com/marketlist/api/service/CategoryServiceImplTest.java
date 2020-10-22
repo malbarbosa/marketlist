@@ -41,10 +41,10 @@ class CategoryServiceImplTest {
 		categoryFake.setId(String.valueOf(categoryFake.hashCode()));
 		categoryFake.setCreatedAt(OffsetDateTime.now());
 		categoryFake.nextVersion();
-		userFake = new UserApp();
-		userFake.setName("Teste");
-		userFake.setPassword("123");
-		userFake.setEmail("teste@teste.com.br");
+		userFake = UserApp.builder()
+				.name("Teste")
+				.password("123")
+				.email("teste@teste.com.br").build();
 	}
 
 	@Test

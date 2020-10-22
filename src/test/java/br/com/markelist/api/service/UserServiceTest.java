@@ -35,9 +35,11 @@ class UserServiceTest {
 
 	@BeforeEach
 	public void setup() throws Exception {
-			userFake = new UserApp();
-			userFake.setName("Teste");
-			userFake.setPassword(passwordEncoder.encode("123"));
+			userFake = 
+			UserApp.builder()
+			.name("Teste")
+			.password(passwordEncoder.encode("123"))
+			.email("teste@teste.com.br").build();
 			userFake.setEmail("teste@teste.com.br");
 			repository.save(userFake);
 	}

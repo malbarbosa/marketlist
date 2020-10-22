@@ -9,14 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import br.com.marketlist.api.model.Category;
 import br.com.marketlist.api.model.Item;
-import br.com.marketlist.api.model.UserApp;
 import br.com.marketlist.api.repository.ItemRepository;
 import br.com.marketlist.api.service.impl.ItemServiceImpl;
 
@@ -26,9 +25,9 @@ class ItemServiceImplTest {
 
 	@InjectMocks
 	private ItemServiceImpl service;
-	@Mock
+	@MockBean
 	private ItemRepository repository;
-	@Mock
+	@MockBean
 	private UserService userService;
 	private Item itemFake;
 	
@@ -45,10 +44,6 @@ class ItemServiceImplTest {
 		categoryFake.setCreatedAt(OffsetDateTime.now());
 		categoryFake.nextVersion();
 		itemFake.setCategory(categoryFake);
-		UserApp userFake = new UserApp();
-		userFake.setName("Teste");
-		userFake.setPassword("123");
-		userFake.setEmail("teste@teste.com.br");
 	}
 
 	@Test

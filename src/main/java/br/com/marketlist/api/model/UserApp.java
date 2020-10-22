@@ -6,10 +6,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Document(collection = "userApp")
+@Builder
 public class UserApp{
 	
 	private String id;

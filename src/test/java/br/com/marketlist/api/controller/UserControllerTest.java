@@ -2,6 +2,9 @@ package br.com.marketlist.api.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import br.com.marketlist.api.Application;
 import br.com.marketlist.api.exception.EntityExists;
@@ -22,6 +26,7 @@ import br.com.marketlist.api.exception.EntityNotFound;
 import br.com.marketlist.api.model.UserApp;
 import br.com.marketlist.api.repository.UserRepository;
 import br.com.marketlist.api.request.UserRequest;
+import br.com.marketlist.api.response.UserResponse;
 import br.com.marketlist.api.service.impl.UserServiceImpl;
 
 @SpringBootTest(classes = Application.class)
@@ -35,21 +40,22 @@ class UserControllerTest {
 	@InjectMocks
 	private UserController controller;
 	private UserApp userFake;
+	@MockBean
+	private ModelMapper mapper;
 
 	@BeforeEach
 	private void setup() {
-		userFake = new UserApp();
-		userFake = new UserApp();
-		userFake.setName("Teste");
-		userFake.setPassword("123");
-		userFake.setEmail("teste@teste.com.br");
+		userFake = UserApp.builder()
+				.name("Teste")
+				.password("123")
+				.email("teste@teste.com.br").build();
 	}
 	
 	@Test
 	void mustReturnFindAll() {
 		List<UserApp> list = new ArrayList<UserApp>();
 		list.add(userFake);
-		Mockito.when(repository.findAll()).thenReturn(list);
+		when(repository.findAll()).thenReturn(list);
 		List<UserApp> findAll = controller.findAll();
 		assertEquals(1, findAll.size());
 		
@@ -61,7 +67,7 @@ class UserControllerTest {
 		request.setEmail("teste@teste.com.br");
 		request.setName("teste");
 		request.setPassword("teste123");
-		Mockito.when(service.findByEmail(Mockito.anyString())).thenReturn(Optional.of(userFake));
+		when(service.findByEmail(anyString())).thenReturn(Optional.of(userFake));
 		assertThrows(
 				EntityExists.class,
 				() -> controller.create(request));
@@ -73,9 +79,20 @@ class UserControllerTest {
 		request.setEmail("teste@teste.com.br");
 		request.setName("teste");
 		request.setPassword("teste123");
-		Mockito.when(service.findByEmail(Mockito.anyString())).thenReturn(Optional.ofNullable(null));
-		Mockito.when(service.create(Mockito.any(UserApp.class))).thenReturn(userFake);
+		when(service.findByEmail(anyString())).thenReturn(Optional.ofNullable(null));
+		
+		UserApp userBuild = doWhenToUserApp();
+		when(service.create(any(UserApp.class)))
+				.thenReturn(userBuild);
 		assertEquals(true, controller.create(request) != null);
+	}
+
+	private UserApp doWhenToUserApp() {
+		UserApp userBuild = UserApp
+				.builder().email("teste@teste.com.br").name("teste").password("teste123").build();
+		when(mapper.map(any(UserRequest.class), any())).thenReturn(userBuild);
+		when(mapper.map(any(UserApp.class), any())).thenReturn(new UserResponse());
+		return userBuild;
 	}
 	
 	@Test
@@ -84,7 +101,7 @@ class UserControllerTest {
 		request.setEmail("teste@teste.com.br");
 		request.setName("teste");
 		request.setPassword("teste123");
-		Mockito.when(repository.findById(Mockito.anyString())).thenReturn(Optional.ofNullable(null));
+		when(repository.findById(anyString())).thenReturn(Optional.ofNullable(null));
 		assertThrows(
 				EntityNotFound.class,
 				() -> controller.update("1231231231313", request));
@@ -96,8 +113,9 @@ class UserControllerTest {
 		request.setEmail("teste@teste.com.br");
 		request.setName("teste");
 		request.setPassword("teste123");
-		Mockito.when(repository.findById(Mockito.anyString())).thenReturn(Optional.of(userFake));
-		Mockito.when(service.update(Mockito.any(UserApp.class))).thenReturn(userFake);
+		UserApp userBuild = doWhenToUserApp();
+		when(repository.findById(anyString())).thenReturn(Optional.of(userFake));
+		when(service.update(any(UserApp.class))).thenReturn(userBuild);
 		assertEquals(true, controller.update("131231231",request) != null);
 	}
 
