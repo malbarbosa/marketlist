@@ -2,6 +2,7 @@ package br.com.marketlist.api.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +47,9 @@ public class ItemController extends AbstractController{
 	private ModelMapper mapper;
 	
 	@GetMapping
-	public List<Item> findAll(){
-		return (List<Item>) repository.findAll();
+	public List<ItemResponse> findAll(){
+		List<Item> items = service.findAllLastVersion();
+		return items.stream().map(item -> mapper.map(item, ItemResponse.class)).collect(Collectors.toList());
 	}
 	
 	@GetMapping("/{id}")

@@ -38,10 +38,10 @@ class ItemServiceImplTest {
 		itemFake.setId(String.valueOf(itemFake.hashCode()));
 		itemFake.setCreatedAt(OffsetDateTime.now());
 		itemFake.nextVersion();
-		Category categoryFake = new Category();
-		categoryFake.setName("Canned");
-		categoryFake.setId(String.valueOf(categoryFake.hashCode()));
-		categoryFake.setCreatedAt(OffsetDateTime.now());
+		
+		Category categoryFake = Category.builder().name("Canned")
+				.createdAt(OffsetDateTime.now())
+				.build();
 		categoryFake.nextVersion();
 		itemFake.setCategory(categoryFake);
 	}

@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Document(collection = "items")
-public class Item implements Serializable{
+public class Item extends AbstractModel implements Serializable,Cloneable{
 
 	
 	/**
@@ -25,30 +25,69 @@ public class Item implements Serializable{
 	
 	@Getter @Setter
 	private Category category;
-
+	
 	@Getter @Setter
+	private String brand;
+
 	private long code;
 
 	@Getter 
 	protected long version;
 	
-	@Getter @Setter
+	@Getter 
 	private boolean deleted;
+	
+	@Getter 
+	private UserApp deletedFor;
+	
+	@Getter 
+	private OffsetDateTime deletedAt;
+	
+	@Getter @Setter
+	private ItemImage image;
 	
 	@Getter @Setter
 	private OffsetDateTime createdAt;
 	@Getter @Setter
-	private Optional<UserApp> createdFor;
+	private UserApp createdFor;
 	
 
+	@Override
 	public void nextVersion() {
 		this.version += 1;
 	}
 	
+	@Override
 	public void setWhoAndWhenCreatedRegistry(Optional<UserApp> createdBy) {
 		setCreatedAt(OffsetDateTime.now());
-		setCreatedFor(createdBy);
+		setCreatedFor(createdBy.get());
+	}
+	@Override
+	public Item clone() {
+		try {
+			return (Item) super.clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+			
+		}
 	}
 
+	@Override
+	public void setWhoAndWhenDeletedRegistry(Optional<UserApp> createdBy) {
+		this.deletedAt = OffsetDateTime.now();
+		this.deletedFor= createdBy.get();
+		this.deleted = true;
+		
+	}
+	@Override
+	public long getCode() {
+		return this.code;
+	}
+
+	@Override
+	public void setCode(long code) {
+		this.code=code;
+		
+	}
 	
 }

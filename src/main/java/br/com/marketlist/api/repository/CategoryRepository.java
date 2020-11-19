@@ -3,6 +3,7 @@ package br.com.marketlist.api.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,12 @@ public interface CategoryRepository extends CrudRepository<Category, String>{
 
 	Optional<Category> findByName(String name);
 
-	List<Category> findAllGroupByNameOrderByVersionDesc();
+	List<Category> findFistGroupByNameOrderByVersionDesc();
+
+	@Query("{'id' : ?0 , 'deleted' : false}")
+	Optional<Category> findByIdAndNotDeleted(String id);
+
+	@Query("{'deleted' : false}")
+	List<Category> findAllOrderByNameDesc();
 	
 }

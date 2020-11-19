@@ -1,5 +1,6 @@
 package br.com.marketlist.api.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,21 +8,17 @@ import org.springframework.stereotype.Service;
 
 import br.com.marketlist.api.model.Item;
 import br.com.marketlist.api.repository.ItemRepository;
+import br.com.marketlist.api.service.AbstractService;
 import br.com.marketlist.api.service.ItemService;
-import br.com.marketlist.api.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl extends AbstractService<Item> implements ItemService{
+	
+	@Autowired
+	protected ItemRepository repository;
 
-	@Autowired
-	private ItemRepository repository;
-	
-	@Autowired
-	private UserService userService;
-	
-	
 	@Override
 	public Optional<Item> findLastVersionBy(String name) {
 		log.info(String.format("BEGIN - Class=ItemServiceImpl, Method=findLastVersionBy, parameters= {name: %s}",name));
@@ -40,6 +37,7 @@ public class ItemServiceImpl implements ItemService{
 	public Item update(final Item item) {
 		log.info("BEGIN - Class=ItemServiceImpl, Method=update, parameters= item: {"+item.toString()+"}");
 		log.info("Get a user from token");
+		this.delete(item);
 		item.setId(null);
 		Item updateditem = save(item);
 		log.info("END - updatedItem: {"+updateditem.toString()+"}");
@@ -49,21 +47,32 @@ public class ItemServiceImpl implements ItemService{
 	
 	@Override
 	public Optional<Item> delete(final Item item) {
-		log.info("BEGIN - Class=ItemServiceImpl, Method=delete, parameters= item: {"+item.toString()+"}");
-		if(item != null && item.getId() != null) {
-			item.setDeleted(true);
-			log.info("END - deletedItem: {"+item.toString()+"}");
-			return Optional.of(save(item));
+		final Item itemToDeleted = item.clone();
+		log.info("BEGIN - Class=ItemServiceImpl, Method=delete, parameters= item: {"+itemToDeleted.toString()+"}");
+		if(itemToDeleted != null && itemToDeleted.getId() != null) {
+			log.info("END - deletedItem: {"+itemToDeleted.toString()+"}");
+			itemToDeleted.setWhoAndWhenDeletedRegistry(userService.getUserFromToken());
+			repository.save(itemToDeleted);
+			return Optional.of(item);
 		}
 		return Optional.empty();
 		
 	}
-	
-	private Item save(final Item item) {
-		item.nextVersion();
-		item.setWhoAndWhenCreatedRegistry(userService.getUserFromToken());
-		item.setCode(item.getCode() == 0?repository.count()+1:item.getCode());
-		return repository.save(item);
+
+	@Override
+	public List<Item> findAllLastVersion() {
+		log.info("BEGIN - Class=CategoryServiceImpl, Method=findAllLastVersion");
+		log.info("Starting searching category last version");
+		return repository.findAllOrderByNameDesc();
 	}
+	@Override
+	protected long getCount() {
+		return repository.count();
+	}
+	@Override
+	protected Item persist(Item entity) {
+		return repository.save(entity);
+	}
+
 	
 }

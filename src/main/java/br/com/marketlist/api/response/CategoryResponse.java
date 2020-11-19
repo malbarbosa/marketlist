@@ -1,6 +1,7 @@
 package br.com.marketlist.api.response;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 
 import lombok.Data;
 
@@ -13,4 +14,7 @@ public class CategoryResponse implements Serializable{
 	
 	private String id;
 	private String name;
+	private String code;
+	private OffsetDateTime createdAt;
+	private UserResponse createdFor;
 }

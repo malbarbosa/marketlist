@@ -2,6 +2,7 @@ package br.com.marketlist.api.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +43,9 @@ public class CategoryController extends AbstractController{
 	private ModelMapper mapper;
 	
 	@GetMapping
-	public List<Category> findAll(){
-		return (List<Category>) service.findAllLastVersion();
+	public List<CategoryResponse> findAll(){
+		List<Category> list = service.findAllLastVersion();
+		return list.stream().map(category -> mapper.map(category, CategoryResponse.class)).collect(Collectors.toList());
 	}
 	
 	@GetMapping("/{id}")
@@ -77,10 +79,10 @@ public class CategoryController extends AbstractController{
 	@ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "Category  updated!")
 	public void update(@PathVariable(name = "id") String id, @Validated  @RequestBody CategoryRequest categoryRequest) {
 		log.info("BEGIN - Class=CategoryController, Method=update, parameters= {id:"+id+",categoryRequest:"+categoryRequest.toString()+"}");
-		Optional<Category> category = repository.findById(id);
+		Optional<Category> category = repository.findByIdAndNotDeleted(id);
 		if(!category.isPresent()) {
-			log.info("Category not found");
-			throw new EntityNotFound("Category not found!");
+			log.info(String.format("Category id %s not found",id));
+			throw new EntityNotFound(String.format("Category id %s not found",id));
 		}
 		
         Category categoryFound = category.get();
@@ -101,7 +103,6 @@ public class CategoryController extends AbstractController{
 		}
 		Category categoryFound = category.get();
 		log.info("categoryFound: {"+ categoryFound.toString()+"}");
-		categoryRequest.setId(id);
 		mapper.map(categoryRequest, categoryFound);
 		service.delete(categoryFound);
 		log.info("END - categoryDeleted: {"+categoryFound.toString()+"}");

@@ -1,38 +1,15 @@
 package br.com.marketlist.api.model;
 
-import java.time.OffsetDateTime;
 import java.util.Optional;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@AllArgsConstructor
-@NoArgsConstructor
-public class AbstractModel {
+public abstract class AbstractModel {
 	
-	@Getter @Setter
-	private long code;
+	public abstract void nextVersion();
 	
-	@Getter 
-	protected long version;
+	public abstract void setWhoAndWhenCreatedRegistry(Optional<UserApp> createdBy);
 	
-	@Getter @Setter
-	private boolean deleted;
+	public abstract void setWhoAndWhenDeletedRegistry(Optional<UserApp> createdBy);
 	
-	@Getter @Setter
-	private OffsetDateTime createdAt;
-	@Getter @Setter
-	private Optional<UserApp> createdFor;
-	
-
-	public void nextVersion() {
-		this.version += 1;
-	}
-	
-	public void setWhoAndWhenCreatedRegistry(Optional<UserApp> createdBy) {
-		setCreatedAt(OffsetDateTime.now());
-		setCreatedFor(createdBy);
-	}
+	public abstract long getCode();
+	public abstract void setCode(long code);
 }

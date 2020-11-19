@@ -36,10 +36,10 @@ class CategoryServiceImplTest {
 	
 	@BeforeEach
 	public void setup() {
-		categoryFake = new Category();
-		categoryFake.setName("Canned");
-		categoryFake.setId(String.valueOf(categoryFake.hashCode()));
-		categoryFake.setCreatedAt(OffsetDateTime.now());
+		categoryFake = Category.builder().name("Canned")
+				.id(String.valueOf(categoryFake.hashCode()))
+				.createdAt(OffsetDateTime.now())
+				.build();
 		categoryFake.nextVersion();
 		userFake = UserApp.builder()
 				.name("Teste")
@@ -49,8 +49,7 @@ class CategoryServiceImplTest {
 
 	@Test
 	public void mustCreateCategory() {
-		var category = new Category();
-		category.setName("Canned");
+		var category = Category.builder().name("Canned").build();
 		Mockito.when(userServiceImpl.getUserFromToken()).thenReturn(Optional.of(userFake));
 		Mockito.when(repository.save(Mockito.any(Category.class))).thenReturn(categoryFake);
 		category = service.create(category);

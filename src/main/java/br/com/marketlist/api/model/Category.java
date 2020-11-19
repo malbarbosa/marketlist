@@ -6,15 +6,22 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Data
-@Document(collection = "categories")
-public class Category implements Cloneable,Serializable, Comparable<Category>{
+@Document(collection = Category.COLLECTION_NAME)
+@EqualsAndHashCode(callSuper = false)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Category extends AbstractModel implements Cloneable,Serializable, Comparable<Category>{
 	
 	
+	public static final String COLLECTION_NAME = "categories";
 	/**
 	 * 
 	 */
@@ -25,28 +32,42 @@ public class Category implements Cloneable,Serializable, Comparable<Category>{
 	@Getter @Setter
 	private String name;
 	
-	@Getter @Setter
+	
 	private long code;
 	
 	@Getter 
 	protected long version;
 	
-	@Getter @Setter
+	@Getter 
 	private boolean deleted;
+	@Getter 
+	private UserApp deletedFor;
 	
-	@Getter @Setter
+	@Getter 
+	private OffsetDateTime deletedAt;
+	
+	@Getter 
 	private OffsetDateTime createdAt;
-	@Getter @Setter
+	@Getter 
 	private UserApp createdFor;
 	
 
+	@Override
 	public void nextVersion() {
 		this.version += 1;
 	}
 	
+	@Override
 	public void setWhoAndWhenCreatedRegistry(Optional<UserApp> createdBy) {
-		setCreatedAt(OffsetDateTime.now());
-		setCreatedFor(createdBy.get());
+		this.createdAt = OffsetDateTime.now();
+		this.createdFor= createdBy.get();
+	}
+	
+	@Override
+	public void setWhoAndWhenDeletedRegistry(Optional<UserApp> createdBy) {
+		this.deletedAt = OffsetDateTime.now();
+		this.deletedFor = createdBy.get();
+		this.deleted = true;
 	}
 	
 	
@@ -67,6 +88,18 @@ public class Category implements Cloneable,Serializable, Comparable<Category>{
 		return (this.version <= c1.getVersion()?1:-1);
 	}
 
+	@Override
+	public long getCode() {
+		return this.code;
+	}
+
+	@Override
+	public void setCode(long code) {
+		this.code = code;
+	}
+
+
+	
 	
 	
 }
