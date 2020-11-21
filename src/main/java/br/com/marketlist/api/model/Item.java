@@ -6,10 +6,14 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Document(collection = "items")
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Item extends AbstractModel implements Serializable,Cloneable{
 
 	
@@ -42,9 +46,6 @@ public class Item extends AbstractModel implements Serializable,Cloneable{
 	
 	@Getter 
 	private OffsetDateTime deletedAt;
-	
-	@Getter @Setter
-	private ItemImage image;
 	
 	@Getter @Setter
 	private OffsetDateTime createdAt;

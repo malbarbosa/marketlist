@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,13 +44,13 @@ public class CategoryController extends AbstractController{
 	private ModelMapper mapper;
 	
 	@GetMapping
-	public List<CategoryResponse> findAll(){
+	public Page<CategoryResponse> findAll(){
 		List<Category> list = service.findAllLastVersion();
-		return list.stream().map(category -> mapper.map(category, CategoryResponse.class)).collect(Collectors.toList());
+		return new PageImpl<>(list.stream().map(category -> mapper.map(category, CategoryResponse.class)).collect(Collectors.toList()));
 	}
 	
 	@GetMapping("/{id}")
-	public Category findById(@RequestParam("id") String id) {
+	public CategoryResponse findById(@PathVariable("id") String id) {
 		log.info("BEGIN - Class=CategoryController, Method=findById, parameters= {id:"+id+"}");
 		Optional<Category> categoryFound = repository.findById(id);
 		if(!categoryFound.isPresent()) {
@@ -58,7 +59,7 @@ public class CategoryController extends AbstractController{
 		}
 		Category category = categoryFound.get();
 		log.info("END - category: {"+ category.toString()+"}");
-		return category;
+		return this.mapper.map(category, CategoryResponse.class);
 		
 	}
 	

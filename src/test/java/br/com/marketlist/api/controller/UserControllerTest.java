@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 
 import br.com.marketlist.api.Application;
 import br.com.marketlist.api.exception.EntityExists;
@@ -56,8 +57,8 @@ class UserControllerTest {
 		List<UserApp> list = new ArrayList<UserApp>();
 		list.add(userFake);
 		when(repository.findAll()).thenReturn(list);
-		List<UserApp> findAll = controller.findAll();
-		assertEquals(1, findAll.size());
+		Page<UserResponse> findAll = (Page<UserResponse>) controller.findAll();
+		assertEquals(1, findAll.getNumber());
 		
 	}
 	

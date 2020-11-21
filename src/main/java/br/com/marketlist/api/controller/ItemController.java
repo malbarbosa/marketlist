@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,22 +48,22 @@ public class ItemController extends AbstractController{
 	private ModelMapper mapper;
 	
 	@GetMapping
-	public List<ItemResponse> findAll(){
+	public Page<ItemResponse> findAll(){
 		List<Item> items = service.findAllLastVersion();
-		return items.stream().map(item -> mapper.map(item, ItemResponse.class)).collect(Collectors.toList());
+		return new PageImpl<>(items.stream().map(item -> mapper.map(item, ItemResponse.class)).collect(Collectors.toList()));
 	}
 	
 	@GetMapping("/{id}")
-	public Item findById(@RequestParam("id") String id) {
+	public ItemResponse findById(@PathVariable("id") String id) {
 		log.info("BEGIN - Class=ItemController, Method=findById, parameters= {id:"+id+"}");
-		Optional<Item> ItemFound = repository.findById(id);
-		if(!ItemFound.isPresent()) {
+		Optional<Item> itemFound = repository.findById(id);
+		if(!itemFound.isPresent()) {
 			log.info("Item not found");
 			throw new EntityNotFound("Item not found!");
 		}
-		Item Item = ItemFound.get();
-		log.info("END - Item: {"+ Item.toString()+"}");
-		return Item;
+		Item item = itemFound.get();
+		log.info("END - Item: {"+ item.toString()+"}");
+		return this.mapper.map(item, ItemResponse.class);
 		
 	}
 	
@@ -83,10 +84,10 @@ public class ItemController extends AbstractController{
 	@ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "Item  updated!")
 	public void update(@PathVariable(name = "id") String id, @Validated  @RequestBody ItemRequest ItemRequest) {
 		log.info("BEGIN - Class=ItemController, Method=update, parameters= {id:"+id+",ItemRequest:"+ItemRequest.toString()+"}");
-		Item ItemFound = checkItem(id);
-		log.info("ItemFound: {"+ ItemFound.toString()+"}");
-		mapper.map(ItemRequest, ItemFound);
-		Item ItemUpdated = service.update(ItemFound);
+		Item itemFound = checkItem(id);
+		log.info("ItemFound: {"+ itemFound.toString()+"}");
+		mapper.map(ItemRequest, itemFound);
+		Item ItemUpdated = service.update(itemFound);
 		log.info("END - ItemUpdated: {"+ItemUpdated.toString()+"}");
 	}
 	
@@ -94,12 +95,12 @@ public class ItemController extends AbstractController{
 	@ResponseStatus(code = HttpStatus.OK, reason = "Item  deleted!")
 	public void delete(@PathVariable(name = "id") String id, @Validated  @RequestBody ItemRequest itemRequest) {
 		log.info("BEGIN - Class=ItemController, Method=delete, parameters= {id:"+id+",ItemRequest:"+itemRequest.toString()+"}");
-		Item ItemFound = checkItem(id);
-		log.info("ItemFound: {"+ ItemFound.toString()+"}");
+		Item itemFound = checkItem(id);
+		log.info("ItemFound: {"+ itemFound.toString()+"}");
 		itemRequest.setId(id);
-		mapper.map(itemRequest, ItemFound);
-		service.delete(ItemFound);
-		log.info("END - ItemDeleted: {"+ItemFound.toString()+"}");
+		mapper.map(itemRequest, itemFound);
+		service.delete(itemFound);
+		log.info("END - ItemDeleted: {"+itemFound.toString()+"}");
 	}
 
 	private Item checkItem(String id) {

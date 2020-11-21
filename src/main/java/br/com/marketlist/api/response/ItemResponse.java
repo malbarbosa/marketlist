@@ -2,9 +2,11 @@ package br.com.marketlist.api.response;
 
 import java.io.Serializable;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ItemResponse implements Serializable{
 	/**
 	 * 
@@ -14,4 +16,5 @@ public class ItemResponse implements Serializable{
 	private String id;
 	private String name;
 	private CategoryResponse category;
+	
 }

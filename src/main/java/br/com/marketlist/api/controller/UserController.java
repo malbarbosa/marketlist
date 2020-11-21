@@ -2,9 +2,13 @@ package br.com.marketlist.api.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,12 +44,15 @@ public class UserController extends AbstractController{
 	private ModelMapper mapper;
 	
 	@GetMapping
-	public List<UserApp> findAll(){
-		return (List<UserApp>) repository.findAll();
+	public Page<UserResponse> findAll(){
+		Iterable<UserApp> iterable = repository.findAll();
+		List<UserApp> content = StreamSupport.stream(iterable.spliterator(), false)
+	    .collect(Collectors.toList());
+		return new PageImpl<>(content.stream().map(item -> mapper.map(item, UserResponse.class)).collect(Collectors.toList()));
 	}
 	
 	@GetMapping("/{id}")
-	public UserApp findById(@RequestParam("id") String id) {
+	public UserResponse findById(@PathVariable(name = "id") String id) {
 		log.info("BEGIN - Class=UserController, Method=findById, parameters= {id:"+id+"}");
 		log.info("BEGIN - repository.findById ");
 		Optional<UserApp> user = repository.findById(id);
@@ -58,7 +64,7 @@ public class UserController extends AbstractController{
 		}
 		UserApp userApp = user.get();
 		log.info("user:{"+userApp.toString()+"}");
-		return userApp;
+		return mapper.map(userApp, UserResponse.class);
 		
 	}
 	

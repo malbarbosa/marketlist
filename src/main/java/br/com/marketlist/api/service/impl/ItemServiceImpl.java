@@ -63,7 +63,7 @@ public class ItemServiceImpl extends AbstractService<Item> implements ItemServic
 	public List<Item> findAllLastVersion() {
 		log.info("BEGIN - Class=CategoryServiceImpl, Method=findAllLastVersion");
 		log.info("Starting searching category last version");
-		return repository.findAllOrderByNameDesc();
+		return repository.findAllOrderByNameDesc() ;
 	}
 	@Override
 	protected long getCount() {

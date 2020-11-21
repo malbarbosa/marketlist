@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/marketlist
+      uri: mongodb://172.17.0.4:27017/marketlist
         
 jwt.secret: javainuse
 

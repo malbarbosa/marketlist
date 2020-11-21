@@ -3,9 +3,11 @@ package br.com.marketlist.api.response;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class CategoryResponse implements Serializable{
 	/**
 	 * 
