@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
+import br.com.marketlist.api.model.Category;
 import br.com.marketlist.api.model.Item;
 import br.com.marketlist.api.repository.ItemRepository;
 import br.com.marketlist.api.service.AbstractService;
@@ -20,10 +23,20 @@ public class ItemServiceImpl extends AbstractService<Item> implements ItemServic
 	protected ItemRepository repository;
 
 	@Override
-	public Optional<Item> findLastVersionBy(String name) {
+	public List<Item> findAllByFilter(String name, String categoryId) {
 		log.info(String.format("BEGIN - Class=ItemServiceImpl, Method=findLastVersionBy, parameters= {name: %s}",name));
 		log.info("Starting searching item last version");
-		return repository.findFirstByNameOrderByVersionDesc(name);
+		ExampleMatcher matcher = ExampleMatcher.matching()
+				.withIgnoreCase()
+				.withIgnorePaths("code","version","category.code","category.version")
+				.withMatcher("name", match -> match.regex())
+				.withMatcher("category.id", match -> match.exact())
+				.withMatcher("deleted", match -> match.exact())
+				.withIgnoreNullValues();
+		Category category = Category.builder().id(categoryId).build();
+		Example<Item> exampleQuery = Example.of(Item.builder().name(name).category(category).deleted(false).build(), matcher);
+		Iterable<Item> results = repository.findAll(exampleQuery);
+		return (List<Item>) results;
 	}
 	@Override
 	public Item create(final Item item){

@@ -7,7 +7,7 @@ import br.com.marketlist.api.model.Item;
 
 public interface ItemService {
 	
-	public Optional<Item> findLastVersionBy(String name);
+	public List<Item> findAllByFilter(String name,String categoryId);
 	
 	public Item create(final Item item);
 	

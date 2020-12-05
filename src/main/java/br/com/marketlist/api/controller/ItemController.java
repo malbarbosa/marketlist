@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,8 +49,8 @@ public class ItemController extends AbstractController{
 	private ModelMapper mapper;
 	
 	@GetMapping
-	public Page<ItemResponse> findAll(){
-		List<Item> items = service.findAllLastVersion();
+	public Page<ItemResponse> findAll(@RequestParam(name="name", required = false) String name,@RequestParam(name="categoryId",required = false) String categoryId){
+		List<Item> items = service.findAllByFilter(name,categoryId);
 		return new PageImpl<>(items.stream().map(item -> mapper.map(item, ItemResponse.class)).collect(Collectors.toList()));
 	}
 	

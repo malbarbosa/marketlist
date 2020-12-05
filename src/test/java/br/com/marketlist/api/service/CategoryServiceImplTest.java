@@ -68,7 +68,7 @@ class CategoryServiceImplTest {
 	public void mustFindCategoryLastVersion() {
 		categoryFake.nextVersion();
 		Mockito.when(repository.findFirstByNameOrderByVersionDesc(Mockito.anyString())).thenReturn(Optional.of(categoryFake));
-		Optional<Category> categoryReturn = service.findLastVersionBy("Canned");
+		Optional<Category> categoryReturn = service.findByName("Canned");
 		assertEquals(categoryReturn.get().getVersion(), 2);
 		
 	}

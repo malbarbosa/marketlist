@@ -3,6 +3,7 @@ package br.com.marketlist.api.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -73,8 +74,8 @@ class ItemServiceImplTest {
 	public void mustFindItemLastVersion() {
 		itemFake.nextVersion();
 		Mockito.when(repository.findFirstByNameOrderByVersionDesc(Mockito.anyString())).thenReturn(Optional.of(itemFake));
-		Optional<Item> itemReturn = service.findLastVersionBy("Canned");
-		assertEquals(itemReturn.get().getVersion(), 2);
+		List<Item> itemReturn = service.findAllByFilter("Canned",null);
+		assertEquals(itemReturn.get(0).getVersion(), 2);
 		
 	}
 

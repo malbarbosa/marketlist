@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import br.com.marketlist.api.model.Category;
@@ -20,10 +22,16 @@ public class CategoryServiceImpl extends AbstractService<Category> implements Ca
 	private CategoryRepository repository;
 	
 	@Override
-	public Optional<Category> findLastVersionBy(String name) {
+	public List<Category> findAllByFilter(String name) {
 		log.info(String.format("BEGIN - Class=CategoryServiceImpl, Method=findLastVersionBy, parameters= {name: %s}",name));
 		log.info("Starting searching category last version");
-		return repository.findFirstByNameOrderByVersionDesc(name);
+		ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreCase().withIgnorePaths("code","version")
+					.withMatcher("name", match -> match.regex())
+					.withMatcher("deleted", match -> match.exact()).withIgnoreNullValues();
+		Example<Category> exampleQuery = Example.of(Category.builder().name(name).deleted(false).build(), matcher);
+		Iterable<Category> results = repository.findAll(exampleQuery);
+		
+		return (List<Category>) results;
 		
 	}
 	
@@ -62,13 +70,6 @@ public class CategoryServiceImpl extends AbstractService<Category> implements Ca
 	@Override
 	public Optional<Category> findByName(String name) {
 		return repository.findByName(name);
-	}
-
-	@Override
-	public List<Category> findAllLastVersion() {
-		log.info("BEGIN - Class=CategoryServiceImpl, Method=findAllLastVersion");
-		log.info("Starting searching category last version");
-		return repository.findAllOrderByNameDesc();
 	}
 
 	@Override

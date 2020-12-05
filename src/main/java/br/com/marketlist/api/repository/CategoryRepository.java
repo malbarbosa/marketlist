@@ -3,14 +3,16 @@ package br.com.marketlist.api.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.QueryByExampleExecutor;
 import org.springframework.stereotype.Component;
 
 import br.com.marketlist.api.model.Category;
 
 @Component
-public interface CategoryRepository extends CrudRepository<Category, String>{
+public interface CategoryRepository extends CrudRepository<Category, String>,QueryByExampleExecutor<Category>{
 
 
 	Optional<Category> findFirstByNameOrderByVersionDesc(String name);

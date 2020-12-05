@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,8 +45,8 @@ public class CategoryController extends AbstractController{
 	private ModelMapper mapper;
 	
 	@GetMapping
-	public Page<CategoryResponse> findAll(){
-		List<Category> list = service.findAllLastVersion();
+	public Page<CategoryResponse> findByFilter(@RequestParam(name = "name", required = false) String name){
+		List<Category> list = service.findAllByFilter(name);
 		return new PageImpl<>(list.stream().map(category -> mapper.map(category, CategoryResponse.class)).collect(Collectors.toList()));
 	}
 	

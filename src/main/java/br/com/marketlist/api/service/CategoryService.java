@@ -7,8 +7,6 @@ import br.com.marketlist.api.model.Category;
 
 public interface CategoryService {
 
-	Optional<Category> findLastVersionBy(String name);
-
 	Category create(Category category);
 
 	Category update(Category category);
@@ -17,6 +15,6 @@ public interface CategoryService {
 
 	Optional<Category> findByName(String name);
 
-	List<Category> findAllLastVersion();
+	List<Category> findAllByFilter(String name);
 
 }
