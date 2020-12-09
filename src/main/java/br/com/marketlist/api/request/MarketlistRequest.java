@@ -1,6 +1,7 @@
 package br.com.marketlist.api.request;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -9,7 +10,7 @@ import javax.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ItemRequest implements Serializable{
+public class MarketlistRequest implements Serializable{
 	
 	
 	/**
@@ -21,6 +22,6 @@ public class ItemRequest implements Serializable{
 	@Size(max = 30)
 	private String name;
 	@Valid
-	private CategoryRequest category;
+	private List<ItemRequest> items;
 
 }

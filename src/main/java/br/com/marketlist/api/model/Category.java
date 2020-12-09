@@ -78,7 +78,7 @@ public class Category extends AbstractModel implements Cloneable,Serializable, C
 		try {
 			return (Category) super.clone();
 		} catch (CloneNotSupportedException e) {
-			return null;
+			return new Category();
 			
 		}
 	}

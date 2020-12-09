@@ -2,6 +2,7 @@ package br.com.marketlist.api.model;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,19 +15,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Document(collection = "items")
-@ToString
-@EqualsAndHashCode(callSuper = false)
 @Builder
+@Document(collection = "marketlist")
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Item extends AbstractModel implements Serializable,Cloneable{
-
+@EqualsAndHashCode(callSuper = false)
+public class Marketlist extends AbstractModel implements Cloneable,Serializable{
 	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 5262854310996863136L;
+	private static final long serialVersionUID = -1138925937957710237L;
+
 	@Getter @Setter
 	private String id;
 	
@@ -34,10 +35,7 @@ public class Item extends AbstractModel implements Serializable,Cloneable{
 	private String name;
 	
 	@Getter @Setter
-	private Category category;
-	
-	@Getter @Setter
-	private String brand;
+	private List<Item> items;
 
 	private long code;
 
@@ -58,25 +56,19 @@ public class Item extends AbstractModel implements Serializable,Cloneable{
 	@Getter @Setter
 	private UserApp createdFor;
 	
+	
 
 	@Override
 	public void nextVersion() {
 		this.version += 1;
+		
 	}
-	
+
 	@Override
 	public void setWhoAndWhenCreatedRegistry(Optional<UserApp> createdBy) {
 		setCreatedAt(OffsetDateTime.now());
 		setCreatedFor(createdBy.get());
-	}
-	@Override
-	public Item clone() {
-		try {
-			return (Item) super.clone();
-		} catch (CloneNotSupportedException e) {
-			return new Item();
-			
-		}
+		
 	}
 
 	@Override
@@ -86,6 +78,7 @@ public class Item extends AbstractModel implements Serializable,Cloneable{
 		this.deleted = true;
 		
 	}
+
 	@Override
 	public long getCode() {
 		return this.code;
@@ -94,7 +87,16 @@ public class Item extends AbstractModel implements Serializable,Cloneable{
 	@Override
 	public void setCode(long code) {
 		this.code=code;
+	}
+
+	@Override
+	public Marketlist clone(){
+		try {
+			return (Marketlist) super.clone();
+		} catch (CloneNotSupportedException e) {
+			return new Marketlist();
+			
+		}
 		
 	}
-	
 }
